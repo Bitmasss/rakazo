@@ -139,6 +139,7 @@ import {
   ComputerCommandSchema,
   foldComputerCommands,
   HERMES_PROVIDER_ID,
+  HermesProfileNameSchema,
   IntegrationProviderIdSchema,
   OPENAI_COMPATIBLE_PROVIDER_ID,
   usableModelId,
@@ -1658,7 +1659,12 @@ export function createRouter(deps: RouterDeps) {
           const inCatalog = knownModels.some(
             (item) => item.provider === input.modelProvider && item.id === input.modelId,
           );
-          if (!inCatalog && credential.defaultModel !== input.modelId) {
+          // A Hermes connection's models are its profiles: any valid profile name
+          // is a choice, since none of them are in the model catalog.
+          const hermesProfile =
+            input.modelProvider === HERMES_PROVIDER_ID &&
+            HermesProfileNameSchema.safeParse(input.modelId).success;
+          if (!inCatalog && !hermesProfile && credential.defaultModel !== input.modelId) {
             throw new ORPCError("BAD_REQUEST", { message: "Unknown model for that provider" });
           }
           if (inCatalog) {
