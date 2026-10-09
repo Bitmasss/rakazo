@@ -457,7 +457,8 @@ export default defineConfig(({ mode }) => {
     preview: {
       host: "0.0.0.0",
       port: Number(process.env.WEB_PORT ?? 5173),
-      allowedHosts: [previewHost],
+      // The shared host name, plus loopback: a Molti on the same machine shows Rakazo from there.
+      allowedHosts: [...new Set([previewHost, "localhost", "127.0.0.1"])],
       proxy: {
         "/api": { target: api, changeOrigin: true },
         "/rpc": { target: api, changeOrigin: true },
