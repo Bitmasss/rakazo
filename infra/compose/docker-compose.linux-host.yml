@@ -1,0 +1,23 @@
+# Linux server with Hermes Agent on the same host (the usual VPS setup). Hermes' API server and
+# the worker's tool bridge listen on the host's loopback, which containers on Linux can't reach
+# through host.docker.internal; so the worker runs on the host network instead, reaching Hermes
+# at http://127.0.0.1:8642 and serving the bridge on 127.0.0.1:7095 itself. Postgres and the
+# supervisor are published on loopback for it. Use instead of docker-compose.hermes.yml:
+#
+#   docker compose --env-file .env -f infra/compose/docker-compose.yml \
+#     -f infra/compose/docker-compose.linux-host.yml up -d --build
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5433}:5432"
+  supervisor:
+    ports:
+      - "127.0.0.1:7091:7091"
+  worker:
+    network_mode: host
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-rakazo}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@127.0.0.1:${POSTGRES_HOST_PORT:-5433}/${POSTGRES_DB:-rakazo}
+      SANDBOX_SUPERVISOR_URL: http://127.0.0.1:7091
+  api:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
