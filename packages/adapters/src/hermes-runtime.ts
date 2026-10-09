@@ -547,7 +547,10 @@ export interface HermesToolBridgeOptions {
   /** Signs each profile's token; keep it stable so Hermes' config keeps working. */
   secret: string;
   port: number;
+  /** The address Hermes reaches the bridge at (default 127.0.0.1). */
   host?: string;
+  /** Where the bridge listens (default 127.0.0.1); 0.0.0.0 inside a container whose port is published. */
+  listenHost?: string;
   /** Tools listed before a profile's first run (Hermes may connect before then). */
   catalog: ConnectorTool[];
 }
@@ -588,7 +591,8 @@ export class HermesToolBridge {
       .digest("hex");
   }
 
-  private listen() {
+  /** Start serving (also done by the first run); Hermes connects when its config is read, often before any run. */
+  listen() {
     if (this.server) return;
     this.server = http.createServer((req, res) => {
       this.handle(req, res).catch((error: unknown) => {
@@ -600,7 +604,7 @@ export class HermesToolBridge {
     this.server.on("error", (error) =>
       getLogger().error("hermes tool bridge could not listen", { error }),
     );
-    this.server.listen(this.options.port, this.options.host ?? "127.0.0.1");
+    this.server.listen(this.options.port, this.options.listenHost ?? "127.0.0.1");
   }
 
   private async handle(req: http.IncomingMessage, res: http.ServerResponse) {

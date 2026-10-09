@@ -98,16 +98,21 @@ async function main() {
       : new PiAgentRuntime({ sessionRoot: resolvePiSessionRoot(dataDir) });
   // Bots on a Hermes connection run there, with this worker's tools over MCP (hermes-runtime.ts).
   const encryptionKey = process.env.ENCRYPTION_KEY;
+  const hermesBridge = encryptionKey
+    ? new HermesToolBridge({
+        secret: encryptionKey,
+        port: HERMES_BRIDGE_PORT,
+        catalog: builtinAgentTools,
+        // In a container, listen where the published port reaches it (docker-compose.hermes.yml).
+        listenHost: process.env.HERMES_BRIDGE_LISTEN || undefined,
+      })
+    : undefined;
+  // Up from the start: Hermes connects to it whenever it reads its config, not just during a run.
+  hermesBridge?.listen();
   const runtime = new HermesAgentRuntime({
     base: baseRuntime,
     stateFile: path.join(dataDir, "hermes", "conversations.json"),
-    bridge: encryptionKey
-      ? new HermesToolBridge({
-          secret: encryptionKey,
-          port: HERMES_BRIDGE_PORT,
-          catalog: builtinAgentTools,
-        })
-      : undefined,
+    bridge: hermesBridge,
   });
   // Same resolver the API uses, so both processes agree on provider, model and key.
   const { key: deploymentModelKey, configured: deploymentModelConfigured } =

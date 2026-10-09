@@ -1,0 +1,19 @@
+# Bots on a Hermes Agent server on the host (or its LAN): the worker reaches Hermes at
+# host.docker.internal, and Hermes reaches the worker's tool bridge on 127.0.0.1:7095.
+#
+#   docker compose --env-file .env -f infra/compose/docker-compose.yml \
+#     -f infra/compose/docker-compose.hermes.yml up -d --build
+#
+# Connect Hermes in model settings at http://host.docker.internal:8642, then give each Hermes
+# profile the bridge's config: pnpm hermes:link http://host.docker.internal:8642 default
+services:
+  worker:
+    environment:
+      HERMES_BRIDGE_LISTEN: 0.0.0.0
+    ports:
+      - "127.0.0.1:7095:7095"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  api:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
