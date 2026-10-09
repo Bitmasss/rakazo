@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { JobPublisher, JobWorkerHost } from "@rakazo/adapter-kit";
 import { ComposioConnector, IntegrationProviderSettings } from "@rakazo/adapters";
 import { loadRootEnv } from "@rakazo/core/node/load-root-env";
@@ -6,6 +7,7 @@ import { createWorkerSecretStore } from "./secret-store.js";
 loadRootEnv();
 
 import {
+  builtinAgentTools,
   ChatSdkMessagingSurface,
   CodexCatalogCache,
   createBackgroundJobHandlers,
@@ -22,6 +24,9 @@ import {
   ExpoPushProvider,
   GraphileJobPublisher,
   GraphileJobWorkerHost,
+  HERMES_BRIDGE_PORT,
+  HermesAgentRuntime,
+  HermesToolBridge,
   InMemoryJobQueue,
   InstalledConnectorProvider,
   isComposioEnabled,
@@ -87,10 +92,23 @@ async function main() {
     runSecretWriter: createRunSecretWriter(secrets),
   });
   const dataDir = process.env.DATA_DIR ?? "./data";
-  const runtime =
+  const baseRuntime =
     process.env.AGENT_RUNTIME === "scripted"
       ? new ScriptedAgentRuntime()
       : new PiAgentRuntime({ sessionRoot: resolvePiSessionRoot(dataDir) });
+  // Bots on a Hermes connection run there, with this worker's tools over MCP (hermes-runtime.ts).
+  const encryptionKey = process.env.ENCRYPTION_KEY;
+  const runtime = new HermesAgentRuntime({
+    base: baseRuntime,
+    stateFile: path.join(dataDir, "hermes", "conversations.json"),
+    bridge: encryptionKey
+      ? new HermesToolBridge({
+          secret: encryptionKey,
+          port: HERMES_BRIDGE_PORT,
+          catalog: builtinAgentTools,
+        })
+      : undefined,
+  });
   // Same resolver the API uses, so both processes agree on provider, model and key.
   const { key: deploymentModelKey, configured: deploymentModelConfigured } =
     resolveDeploymentModel();

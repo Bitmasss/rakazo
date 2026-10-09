@@ -4,6 +4,7 @@ import {
   CLOUDFLARE_AI_GATEWAY_CONFIG_MESSAGE,
   OPENAI_COMPATIBLE_PROVIDER_ID as CONTRACT_OPENAI_COMPAT,
   cloudflareGatewayRouting,
+  HERMES_PROVIDER_ID,
   isCloudflareAiGatewayProvider,
   modelOutputLeavesInputRoom,
 } from "@rakazo/contracts";
@@ -39,6 +40,29 @@ export function buildModelConnectPlaintext(
     ...(cacheCapabilities !== undefined ? { cacheCapabilities } : {}),
     ...(contextWindow !== undefined ? { contextWindow } : {}),
   };
+  if (input.provider === HERMES_PROVIDER_ID) {
+    const prepared = prepareOpenAiCompatibleConnect({
+      ...input,
+      modelId: input.modelId?.trim() || "default",
+    });
+    const sameServer =
+      previous?.kind === "openai_compatible" && previous.baseUrl === prepared.baseUrl;
+    // Keys left out are kept for the same server; an empty one removes that profile.
+    const merged: Record<string, string | undefined> = {
+      ...(sameServer ? previous.profileKeys : {}),
+      ...(input.profileKeys ?? {}),
+    };
+    const profileKeys: Record<string, string> = {};
+    for (const [name, key] of Object.entries(merged))
+      if (key?.trim()) profileKeys[name] = key.trim();
+    const apiKey = input.apiKey === undefined && sameServer ? previous.apiKey : prepared.apiKey;
+    return serializeModelSecret({
+      kind: "openai_compatible",
+      baseUrl: prepared.baseUrl,
+      ...(apiKey ? { apiKey } : {}),
+      ...(Object.keys(profileKeys).length ? { profileKeys } : {}),
+    });
+  }
   if (input.provider === OPENAI_COMPATIBLE_PROVIDER_ID) {
     const prepared = prepareOpenAiCompatibleConnect(input);
     const sameEndpoint =
@@ -249,6 +273,10 @@ export function modelCredentialDto(
         : {}),
       ...(parsed.kind === "api_key" && parsed.accountId ? { accountId: parsed.accountId } : {}),
       ...(parsed.kind === "api_key" && parsed.gatewayId ? { gatewayId: parsed.gatewayId } : {}),
+      // A Hermes server's address (never its keys) so its settings can show it.
+      ...(row.provider === HERMES_PROVIDER_ID && parsed.kind === "openai_compatible"
+        ? { baseUrl: parsed.baseUrl }
+        : {}),
     };
   }
   const compatibleCredential = {

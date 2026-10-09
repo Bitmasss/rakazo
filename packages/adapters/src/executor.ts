@@ -46,6 +46,7 @@ import {
   CLOUDFLARE_AI_GATEWAY_CONFIG_MESSAGE,
   COMPUTER_COMMAND_OUTPUT_MAX_CHARS,
   disabledBuiltinToolSet,
+  HERMES_PROVIDER_ID,
   HistoryReadInputSchema,
   HistorySearchInputSchema,
   isAttachmentImageMimeType,
@@ -8408,8 +8409,13 @@ async function resolveModelKey(
       const accountId = resolved.secret.kind === "api_key" ? resolved.secret.accountId : undefined;
       const gatewayId = resolved.secret.kind === "api_key" ? resolved.secret.gatewayId : undefined;
       cloudflareGatewayProviderEnv({ provider, accountId, gatewayId });
+      // A Hermes profile other than the default has its own key on the same server.
+      const profileKey =
+        provider === HERMES_PROVIDER_ID && resolved.secret.kind === "openai_compatible"
+          ? resolved.secret.profileKeys?.[modelId]
+          : undefined;
       return {
-        apiKey: resolved.apiKey,
+        apiKey: profileKey ?? resolved.apiKey,
         accountId,
         gatewayId,
         baseUrl,

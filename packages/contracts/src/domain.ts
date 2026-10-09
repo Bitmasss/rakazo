@@ -1077,6 +1077,10 @@ export const ModelBackupListSchema = z
   });
 
 export const OPENAI_COMPATIBLE_PROVIDER_ID = "openai-compatible";
+/** A Hermes Agent API server: its bots' turns run there (HermesAgentRuntime), one model per profile. */
+export const HERMES_PROVIDER_ID = "hermes";
+/** Hermes profile names, as the server serves them under /p/<name>. */
+export const HermesProfileNameSchema = z.string().regex(/^[a-z0-9][a-z0-9_-]{0,63}$/i);
 
 export const ModelConnectInputSchema = z
   .object({
@@ -1093,6 +1097,8 @@ export const ModelConnectInputSchema = z
     maxTokens: z.number().int().min(1).max(MAX_MODEL_MAX_TOKENS).nullable().optional(),
     supportsImages: z.boolean().optional(),
     maxImagesPerPrompt: z.number().int().min(1).max(1000).nullable().optional(),
+    /** Hermes: the API key of each profile other than the default (each has its own). */
+    profileKeys: z.record(HermesProfileNameSchema, z.string().min(8).max(512)).optional(),
   })
   .superRefine((value, ctx) => {
     if (!modelOutputLeavesInputRoom(value.maxTokens, value.contextWindow)) {
@@ -1117,6 +1123,22 @@ export const ModelConnectInputSchema = z
           path: ["gatewayId"],
         });
       }
+    }
+    if (value.provider === HERMES_PROVIDER_ID) {
+      if (!value.baseUrl?.trim()) {
+        ctx.addIssue({
+          code: "custom",
+          message: "The Hermes server's address is required",
+          path: ["baseUrl"],
+        });
+      }
+      if (
+        value.modelId !== undefined &&
+        !HermesProfileNameSchema.safeParse(value.modelId).success
+      ) {
+        ctx.addIssue({ code: "custom", message: "Pick a Hermes profile", path: ["modelId"] });
+      }
+      return;
     }
     if (value.provider === OPENAI_COMPATIBLE_PROVIDER_ID) {
       if (!value.baseUrl?.trim()) {

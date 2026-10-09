@@ -1,7 +1,7 @@
 import type { AgentRunRequest, SecretStore } from "@rakazo/adapter-kit";
 import { SecretStoreUnavailableError } from "@rakazo/adapter-kit";
 import type { Actor } from "@rakazo/contracts";
-import { usableModelId } from "@rakazo/contracts";
+import { HERMES_PROVIDER_ID, HermesProfileNameSchema, usableModelId } from "@rakazo/contracts";
 import {
   chooseModelCredential,
   type findDefaultModelCredential,
@@ -333,6 +333,12 @@ export async function validateConnectedModelChoice(
   if (!credential) return "Connect that model provider first";
   if (!usableModelId(modelId)) return "Unknown model for that provider";
   if (isCatalogModelChoice(provider, modelId)) return undefined;
+  // A Hermes connection's models are its profiles.
+  if (provider === HERMES_PROVIDER_ID) {
+    return HermesProfileNameSchema.safeParse(modelId).success
+      ? undefined
+      : "Unknown Hermes profile";
+  }
   // Free-form saved IDs only resolve at runtime for openai-compatible connections.
   if (provider !== OPENAI_COMPATIBLE_PROVIDER_ID) {
     return "Unknown model for that provider";

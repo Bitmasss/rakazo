@@ -283,6 +283,8 @@ export type StoredModelSecret =
       contextWindow?: number;
       visionModelIds?: string[];
       maxImagesPerPrompt?: number;
+      /** Hermes: API keys of profiles other than the default, by profile name. */
+      profileKeys?: Record<string, string>;
     } & StoredModelLimits);
 
 export type PiOAuthConnected = {
@@ -410,9 +412,21 @@ export function parseModelSecret(plaintext: string): StoredModelSecret {
       parsed.maxImagesPerPrompt <= 1000
         ? parsed.maxImagesPerPrompt
         : undefined;
+    const profileKeys =
+      parsed.profileKeys &&
+      typeof parsed.profileKeys === "object" &&
+      !Array.isArray(parsed.profileKeys)
+        ? Object.fromEntries(
+            Object.entries(parsed.profileKeys as Record<string, unknown>).filter(
+              (entry): entry is [string, string] =>
+                typeof entry[1] === "string" && entry[1].length > 0,
+            ),
+          )
+        : undefined;
     return {
       kind: "openai_compatible",
       baseUrl: parsed.baseUrl.trim(),
+      ...(profileKeys && Object.keys(profileKeys).length ? { profileKeys } : {}),
       ...(apiKey ? { apiKey } : {}),
       ...(typeof parsed.reasoning === "boolean" ? { reasoning: parsed.reasoning } : {}),
       ...(thinkingLevel !== undefined ? { thinkingLevel } : {}),
@@ -481,6 +495,9 @@ export function serializeModelSecret(secret: StoredModelSecret): string {
       ...(secret.maxImagesPerPrompt !== undefined
         ? { maxImagesPerPrompt: secret.maxImagesPerPrompt }
         : {}),
+      ...(secret.profileKeys && Object.keys(secret.profileKeys).length
+        ? { profileKeys: secret.profileKeys }
+        : {}),
     });
   }
   if (
@@ -504,7 +521,11 @@ export function serializeModelSecret(secret: StoredModelSecret): string {
 
 export function secretValuesToRedact(secret: StoredModelSecret): string[] {
   if (secret.kind === "api_key") return secret.key ? [secret.key] : [];
-  if (secret.kind === "openai_compatible") return secret.apiKey ? [secret.apiKey] : [];
+  if (secret.kind === "openai_compatible") {
+    return [secret.apiKey, ...Object.values(secret.profileKeys ?? {})].filter(
+      (v): v is string => !!v,
+    );
+  }
   return [secret.credential.access, secret.credential.refresh].filter(Boolean);
 }
 

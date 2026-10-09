@@ -66,6 +66,7 @@ import {
 import { rpc } from "../lib/rpc";
 import { useModelOAuthSignIn } from "../lib/use-model-oauth-signin";
 import { errorText } from "../lib/user-error";
+import { HermesConnectionSettings } from "./HermesConnectionSettings";
 import { ModelBackupsSettings } from "./ModelBackupsSettings";
 
 function connectionMaxTokensField(providerId: string, stored: number | undefined): string {
@@ -1462,6 +1463,7 @@ export function ModelSettingsOverlay({
               <Trans>No model catalog is available.</Trans>
             </p>
           )}
+          <HermesConnectionSettings />
           {me ? (
             <ModelBackupsSettings
               userId={me.userId}

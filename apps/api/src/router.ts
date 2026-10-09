@@ -137,6 +137,7 @@ import {
   BotSecretAuth,
   ComputerCommandSchema,
   foldComputerCommands,
+  HERMES_PROVIDER_ID,
   IntegrationProviderIdSchema,
   OPENAI_COMPATIBLE_PROVIDER_ID,
   usableModelId,
@@ -1063,6 +1064,34 @@ export function createRouter(deps: RouterDeps) {
     },
     models: {
       list: authed.models.list.handler(async ({ context }) => {
+        // A Hermes connection's models are its profiles: the default one and each with its own key.
+        const hermesProfilesForActor = async (actor: typeof context.actor) => {
+          const credential = await findModelCredential(deps.prisma, actor, HERMES_PROVIDER_ID);
+          if (!credential) return [];
+          const secret = await deps.prisma.secret.findFirst({
+            where: { id: credential.secretId, userId: actor.userId, spaceId: null },
+            select: { ciphertext: true },
+          });
+          let names: string[] = [];
+          try {
+            const parsed = secret
+              ? parseModelSecret(await deps.secrets.load(secret.ciphertext, credential.secretId))
+              : undefined;
+            names =
+              parsed?.kind === "openai_compatible" ? Object.keys(parsed.profileKeys ?? {}) : [];
+          } catch {
+            names = [];
+          }
+          return ["default", ...names].map((id) => ({
+            provider: HERMES_PROVIDER_ID,
+            providerName: "Hermes",
+            id,
+            label: id === "default" ? "Hermes (default profile)" : `Hermes: ${id}`,
+            billing: "Runs on your Hermes server.",
+            auth: "api-key" as const,
+            subscription: false,
+          }));
+        };
         const auth = await modelCredentialAuthKindsForSpace(
           deps.prisma,
           deps.secrets,
@@ -1082,7 +1111,10 @@ export function createRouter(deps: RouterDeps) {
               refreshExpiredCredential(context.actor, secretId, CHATGPT_OAUTH_PROVIDER),
           },
         );
-        const catalog = live.size > 0 ? applyCodexLiveCatalog(available, auth, live) : available;
+        const catalog = [
+          ...(live.size > 0 ? applyCodexLiveCatalog(available, auth, live) : available),
+          ...(await hermesProfilesForActor(context.actor)),
+        ];
         // The scripted fixture only exists to drive the scripted runtime; a real
         // runtime cannot execute it, so it stays out of the user-facing catalog.
         return deps.env.agentRuntime === "scripted" ? [...catalog, scriptedCatalogEntry] : catalog;

@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import path from "node:path";
 import { ORPCError, onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import type {
@@ -40,6 +41,7 @@ import {
   ExpoPushProvider,
   endSessionPushToken,
   GraphileJobPublisher,
+  HermesAgentRuntime,
   InMemoryJobQueue,
   InMemoryRealtimeFanout,
   InstalledConnectorProvider,
@@ -372,11 +374,15 @@ export async function createApp(
   integrationSettings.warmDirectories();
   const runtime =
     runtimeOverride ??
-    (env.agentRuntime === "scripted"
-      ? new ScriptedAgentRuntime()
-      : new PiAgentRuntime({
-          sessionRoot: env.piSessionRecording ? piSessionsRoot(env.dataDir) : undefined,
-        }));
+    new HermesAgentRuntime({
+      base:
+        env.agentRuntime === "scripted"
+          ? new ScriptedAgentRuntime()
+          : new PiAgentRuntime({
+              sessionRoot: env.piSessionRecording ? piSessionsRoot(env.dataDir) : undefined,
+            }),
+      stateFile: path.join(env.dataDir, "hermes", "conversations.json"),
+    });
   const notifications = new ExpoPushProvider(env.dataDir, (sessionId) =>
     pushSessionExpiresAt(prisma, sessionId),
   );
