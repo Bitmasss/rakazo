@@ -286,6 +286,10 @@ msgstr "추가"
 msgid "Add a model in Settings to use this."
 msgstr "이 기능을 사용하려면 설정에서 모델을 추가하세요."
 
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Add a profile"
+msgstr ""
+
 #: src/pages/Shell.tsx
 msgid "Add a run time for this one-shot."
 msgstr "이 일회성 실행의 시간을 추가하세요."
@@ -516,9 +520,21 @@ msgstr "API가 다시 작동하지만 업데이트가 완료되지 않았습니�
 msgid "API key"
 msgstr "API 키"
 
+#: src/pages/HermesConnectionSettings.tsx
+msgid "API key (API_SERVER_KEY)"
+msgstr ""
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "API key (saved; enter a new one to replace it)"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 msgid "API key header"
 msgstr "API 키 헤더"
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "API server address"
+msgstr ""
 
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Appearance"
@@ -1137,6 +1153,10 @@ msgstr "API 키 연결"
 #: src/pages/PluginsOverlay.tsx
 msgid "Connect Executor"
 msgstr "Executor 연결"
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Connect Hermes"
+msgstr ""
 
 #: src/pages/shell/message-cards.tsx
 msgid "Connect MCP server “{name}”"
@@ -2343,6 +2363,10 @@ msgstr "헤더 값"
 msgid "Hear a sample"
 msgstr "샘플 듣기"
 
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Hermes Agent"
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Hi, this is how I'll sound when I read replies out loud."
 msgstr "안녕하세요. 답변을 소리 내어 읽을 때 이런 목소리로 들립니다."
@@ -2463,6 +2487,10 @@ msgstr "이 Bot만 사용"
 
 #: src/pages/Artifacts.tsx
 msgid "Isolated preview — no access to your account"
+msgstr ""
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Its API key"
 msgstr ""
 
 #: src/pages/shell/dialogs.tsx
@@ -3347,6 +3375,14 @@ msgstr "Bot 전용"
 msgid "Private workspace with its own bots and groups."
 msgstr ""
 
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Profile name"
+msgstr ""
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Profiles"
+msgstr ""
+
 #: src/components/integrations/IntegrationSetup.tsx
 msgid "Project ID"
 msgstr ""
@@ -3502,6 +3538,7 @@ msgid "Release interrupted computer?"
 msgstr ""
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/pages/HermesConnectionSettings.tsx
 #: src/pages/ModelBackupsSettings.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/ScratchpadSection.tsx
@@ -3722,6 +3759,10 @@ msgstr ""
 msgid "Run at"
 msgstr "실행 시간"
 
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Run bots on your own Hermes server. Each profile is a model: a bot set to it thinks with Hermes' memory and skills, and uses Rakazo's tools."
+msgstr ""
+
 #: src/pages/RoutineRunHistory.tsx
 msgid "Run history"
 msgstr "실행 기록"
@@ -3754,6 +3795,7 @@ msgstr ""
 #: src/components/teach/SkillDraftCard.tsx
 #: src/pages/ExternalConversationSettings.tsx
 #: src/pages/GroupPanel.tsx
+#: src/pages/HermesConnectionSettings.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/RoutineEditor.tsx
@@ -3795,6 +3837,10 @@ msgstr "저장했지만 목록을 새로고침하지 못했습니다."
 #: src/pages/ModelSettingsOverlay.tsx
 msgid "Saved."
 msgstr "저장되었습니다."
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Saved. Pick a Hermes profile as a bot's model to run it on Hermes."
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "Saved. Rotate to reveal."

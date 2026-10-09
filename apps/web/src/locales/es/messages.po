@@ -286,6 +286,10 @@ msgstr "Agregar"
 msgid "Add a model in Settings to use this."
 msgstr "Agrega un modelo en Configuración para usarlo."
 
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Add a profile"
+msgstr ""
+
 #: src/pages/Shell.tsx
 msgid "Add a run time for this one-shot."
 msgstr "Agrega una hora de ejecución para este one-shot."
@@ -516,9 +520,21 @@ msgstr "La API volvió, pero la actualización no terminó. Revisa los logs del 
 msgid "API key"
 msgstr "Clave de API"
 
+#: src/pages/HermesConnectionSettings.tsx
+msgid "API key (API_SERVER_KEY)"
+msgstr ""
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "API key (saved; enter a new one to replace it)"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 msgid "API key header"
 msgstr "Encabezado de clave de API"
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "API server address"
+msgstr ""
 
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Appearance"
@@ -1137,6 +1153,10 @@ msgstr "Conectar clave de API"
 #: src/pages/PluginsOverlay.tsx
 msgid "Connect Executor"
 msgstr "Conectar Executor"
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Connect Hermes"
+msgstr ""
 
 #: src/pages/shell/message-cards.tsx
 msgid "Connect MCP server “{name}”"
@@ -2343,6 +2363,10 @@ msgstr "Valor del encabezado"
 msgid "Hear a sample"
 msgstr "Escuchar una muestra"
 
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Hermes Agent"
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Hi, this is how I'll sound when I read replies out loud."
 msgstr "Hola, así sonaré cuando lea las respuestas en voz alta."
@@ -2463,6 +2487,10 @@ msgstr "Aislado"
 
 #: src/pages/Artifacts.tsx
 msgid "Isolated preview — no access to your account"
+msgstr ""
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Its API key"
 msgstr ""
 
 #: src/pages/shell/dialogs.tsx
@@ -3347,6 +3375,14 @@ msgstr "Privado"
 msgid "Private workspace with its own bots and groups."
 msgstr ""
 
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Profile name"
+msgstr ""
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Profiles"
+msgstr ""
+
 #: src/components/integrations/IntegrationSetup.tsx
 msgid "Project ID"
 msgstr ""
@@ -3502,6 +3538,7 @@ msgid "Release interrupted computer?"
 msgstr ""
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/pages/HermesConnectionSettings.tsx
 #: src/pages/ModelBackupsSettings.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/ScratchpadSection.tsx
@@ -3722,6 +3759,10 @@ msgstr ""
 msgid "Run at"
 msgstr "Ejecutar a las"
 
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Run bots on your own Hermes server. Each profile is a model: a bot set to it thinks with Hermes' memory and skills, and uses Rakazo's tools."
+msgstr ""
+
 #: src/pages/RoutineRunHistory.tsx
 msgid "Run history"
 msgstr "Historial de ejecuciones"
@@ -3754,6 +3795,7 @@ msgstr ""
 #: src/components/teach/SkillDraftCard.tsx
 #: src/pages/ExternalConversationSettings.tsx
 #: src/pages/GroupPanel.tsx
+#: src/pages/HermesConnectionSettings.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/RoutineEditor.tsx
@@ -3795,6 +3837,10 @@ msgstr "Guardado, pero falló la actualización de la lista"
 #: src/pages/ModelSettingsOverlay.tsx
 msgid "Saved."
 msgstr "Guardado."
+
+#: src/pages/HermesConnectionSettings.tsx
+msgid "Saved. Pick a Hermes profile as a bot's model to run it on Hermes."
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "Saved. Rotate to reveal."
