@@ -72,7 +72,9 @@ export function HermesConnectionSettings({ onChanged }: { onChanged?: () => void
     }
   }
 
-  const ready = baseUrl.trim().length > 0 && (credential !== null || apiKey.trim().length >= 8);
+  // No key needed when the host shares its profiles' keys (Molti's Link Hermes profiles).
+  const ready =
+    baseUrl.trim().length > 0 && (apiKey.trim().length === 0 || apiKey.trim().length >= 8);
   return (
     <section
       data-testid="hermes-connection"
@@ -85,7 +87,8 @@ export function HermesConnectionSettings({ onChanged }: { onChanged?: () => void
       <p className="mt-1 text-[13px] leading-[1.5] text-muted-foreground">
         <Trans>
           Run bots on your own Hermes server. Each profile is a model: a bot set to it thinks with
-          Hermes' memory and skills, and uses Rakazo's tools.
+          Hermes' memory and skills, and uses Rakazo's tools. When Molti runs this Rakazo, Link
+          Hermes profiles in Molti fills in every profile and its key: just connect.
         </Trans>
       </p>
       <div className="mt-3 grid gap-2">
@@ -105,7 +108,7 @@ export function HermesConnectionSettings({ onChanged }: { onChanged?: () => void
             {credential?.hasKey ? (
               <Trans>API key (saved; enter a new one to replace it)</Trans>
             ) : (
-              <Trans>API key (API_SERVER_KEY)</Trans>
+              <Trans>API key (optional when Molti shares your profiles)</Trans>
             )}
           </span>
           <Input

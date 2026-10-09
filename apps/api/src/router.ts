@@ -64,6 +64,7 @@ import {
   forgetBotSecret,
   hasActiveComputerControl,
   hostCredentialSource,
+  hostHermesProfiles,
   isAutoReviewCheckerConfigured,
   isComputerScreenUnavailable,
   isSandboxGoneError,
@@ -1082,7 +1083,9 @@ export function createRouter(deps: RouterDeps) {
           } catch {
             names = [];
           }
-          return ["default", ...names].map((id) => ({
+          // Plus every profile the host shares with its key (hermes-profiles.json).
+          const shared = Object.keys(hostHermesProfiles().profiles);
+          return [...new Set(["default", ...names, ...shared])].map((id) => ({
             provider: HERMES_PROVIDER_ID,
             providerName: "Hermes",
             id,

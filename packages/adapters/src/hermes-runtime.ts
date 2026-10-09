@@ -370,6 +370,39 @@ export class HermesAgentRuntime implements AgentRuntime {
   }
 }
 
+// --- profiles the host shares --------------------------------------------------------------------
+// The machine Rakazo runs on can share its Hermes server's profiles and their API keys (Molti does,
+// from Hermes' own files) in DATA_DIR/hermes/hermes-profiles.json: { "profiles": { "<name>": "<key>" } }.
+// Every profile in it is a model of a Hermes connection, and its key is used when the connection has
+// none of its own, so connecting Hermes needs no keys at all.
+
+export interface HostHermesProfiles {
+  profiles: Record<string, string>;
+}
+
+let hostProfilesCache: { at: number; value: HostHermesProfiles } | undefined;
+
+export function hostHermesProfiles(dataDir = process.env.DATA_DIR ?? "./data"): HostHermesProfiles {
+  if (hostProfilesCache && Date.now() - hostProfilesCache.at < 5000) return hostProfilesCache.value;
+  let value: HostHermesProfiles = { profiles: {} };
+  try {
+    const raw = JSON.parse(
+      fs.readFileSync(path.join(dataDir, "hermes", "hermes-profiles.json"), "utf8"),
+    );
+    const profiles: Record<string, string> = {};
+    for (const [name, key] of Object.entries(raw?.profiles ?? {})) {
+      if (/^[a-z0-9][a-z0-9_-]{0,63}$/i.test(name) && typeof key === "string" && key.length >= 8) {
+        profiles[name] = key;
+      }
+    }
+    value = { profiles };
+  } catch {
+    // none shared
+  }
+  hostProfilesCache = { at: Date.now(), value };
+  return value;
+}
+
 // --- the endpoint a bot runs on ----------------------------------------------------------------
 
 export interface HermesEndpoint {

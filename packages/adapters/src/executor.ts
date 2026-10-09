@@ -241,6 +241,7 @@ import { redactConnectorPayload, sanitizeConnectorError } from "./connector-safe
 import { formatCurrentTimeInstruction } from "./current-time.js";
 import { resolveDeploymentModel } from "./deployment-model.js";
 import { handoffToGroupBot, loadGroupContext } from "./group-handoff.js";
+import { hostHermesProfiles } from "./hermes-runtime.js";
 import {
   COMPACTION_BATCH_SIZE,
   formatCompactedSummary,
@@ -8410,9 +8411,10 @@ async function resolveModelKey(
       const gatewayId = resolved.secret.kind === "api_key" ? resolved.secret.gatewayId : undefined;
       cloudflareGatewayProviderEnv({ provider, accountId, gatewayId });
       // A Hermes profile other than the default has its own key on the same server.
+      // Its own key for the profile, else the one the host shares (hermes-runtime.ts hostHermesProfiles).
       const profileKey =
         provider === HERMES_PROVIDER_ID && resolved.secret.kind === "openai_compatible"
-          ? resolved.secret.profileKeys?.[modelId]
+          ? (resolved.secret.profileKeys?.[modelId] ?? hostHermesProfiles().profiles[modelId])
           : undefined;
       return {
         apiKey: profileKey ?? resolved.apiKey,

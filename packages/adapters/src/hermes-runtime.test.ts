@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import type { IncomingHttpHeaders, IncomingMessage, ServerResponse } from "node:http";
 import http from "node:http";
 import type { AddressInfo } from "node:net";
@@ -13,7 +13,12 @@ import type {
   ConnectorTool,
 } from "@rakazo/adapter-kit";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { HermesAgentRuntime, HermesToolBridge, hermesEndpoint } from "./hermes-runtime.js";
+import {
+  HermesAgentRuntime,
+  HermesToolBridge,
+  hermesEndpoint,
+  hostHermesProfiles,
+} from "./hermes-runtime.js";
 
 // A scriptable stand-in for Hermes' Agent API server. Each test sets `plan` before a run starts.
 
@@ -572,5 +577,31 @@ describe("HermesAgentRuntime empty replies", () => {
     const events = await drain(runtime.run(request()));
 
     expect(events.at(-1)).toEqual(done("No response. Try again."));
+  });
+});
+
+describe("hostHermesProfiles", () => {
+  it("reads the profiles and keys the host shares, skipping bad entries", () => {
+    const dir = mkdtempSync(join(tmpdir(), "hermes-host-"));
+    try {
+      mkdirSync(join(dir, "hermes"));
+      writeFileSync(
+        join(dir, "hermes", "hermes-profiles.json"),
+        JSON.stringify({
+          profiles: {
+            default: "k-default-123",
+            fluence: "k-fluence-456",
+            "bad name": "k-x-12345678",
+            short: "k",
+          },
+        }),
+      );
+      expect(hostHermesProfiles(dir).profiles).toEqual({
+        default: "k-default-123",
+        fluence: "k-fluence-456",
+      });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

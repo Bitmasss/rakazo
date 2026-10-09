@@ -521,7 +521,7 @@ msgid "API key"
 msgstr "API-Schlüssel"
 
 #: src/pages/HermesConnectionSettings.tsx
-msgid "API key (API_SERVER_KEY)"
+msgid "API key (optional when Molti shares your profiles)"
 msgstr ""
 
 #: src/pages/HermesConnectionSettings.tsx
@@ -3760,7 +3760,7 @@ msgid "Run at"
 msgstr ""
 
 #: src/pages/HermesConnectionSettings.tsx
-msgid "Run bots on your own Hermes server. Each profile is a model: a bot set to it thinks with Hermes' memory and skills, and uses Rakazo's tools."
+msgid "Run bots on your own Hermes server. Each profile is a model: a bot set to it thinks with Hermes' memory and skills, and uses Rakazo's tools. When Molti runs this Rakazo, Link Hermes profiles in Molti fills in every profile and its key: just connect."
 msgstr ""
 
 #: src/pages/RoutineRunHistory.tsx
